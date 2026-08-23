@@ -26,20 +26,28 @@ def vis_kalender():
     start_of_day = now.replace(hour=0, minute=0, second=0, microsecond=0).isoformat()
     end_of_day = now.replace(hour=23, minute=59, second=59, microsecond=0).isoformat()
 
-    events_result = service.events().list(
-        calendarId="primary",
-        timeMin=start_of_day,
-        timeMax=end_of_day,
-        singleEvents=True,
-        orderBy="startTime"
-    ).execute()
+    kalenderliste = service.calendarList().list().execute()
 
-    events = events_result.get("items", [])
+    alle_hendelser = []
 
-    if not events:
+    for kalender in kalenderliste["items"]:
+        events_result = service.events().list(
+            calendarId=kalender["id"],
+            timeMin=start_of_day,
+            timeMax=end_of_day,
+            singleEvents=True,
+            orderBy="startTime"
+        ).execute()
+
+        for event in events_result.get("items", []):
+            alle_hendelser.append(event)
+
+    alle_hendelser.sort(key=lambda e: e["start"].get("dateTime", e["start"].get("date")))
+
+    if not alle_hendelser:
         st.write("Ingen planer i dag 🎉")
     else:
-        for event in events:
+        for event in alle_hendelser:
             start = event["start"].get("dateTime", event["start"].get("date"))
             tid = datetime.fromisoformat(start).strftime("%H:%M") if "T" in start else "Hele dagen"
             st.write(f"**{tid}** – {event['summary']}")
