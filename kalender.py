@@ -1,5 +1,6 @@
 import streamlit as st
 from datetime import datetime, timezone
+from zoneinfo import ZoneInfo
 from google.oauth2.credentials import Credentials
 from google.auth.transport.requests import Request
 from googleapiclient.discovery import build
@@ -22,7 +23,8 @@ def vis_kalender():
 
     service = build("calendar", "v3", credentials=creds)
 
-    now = datetime.now(timezone.utc)
+    oslo = ZoneInfo("Europe/Oslo")
+    now = datetime.now(oslo)
     start_of_day = now.replace(hour=0, minute=0, second=0, microsecond=0).isoformat()
     end_of_day = now.replace(hour=23, minute=59, second=59, microsecond=0).isoformat()
 
@@ -40,14 +42,25 @@ def vis_kalender():
         ).execute()
 
         for event in events_result.get("items", []):
-            alle_hendelser.append(event)
+            start = event["start"].get("dateTime", event["start"].get("date"))
 
-    alle_hendelser.sort(key=lambda e: e["start"].get("dateTime", e["start"].get("date")))
+            if "T" in start:
+                sorteringstid = datetime.fromisoformat(start).astimezone(oslo)
+            else:
+                sorteringstid = datetime.combine(
+                    datetime.fromisoformat(start).date(),
+                    datetime.min.time(),
+                    tzinfo=oslo
+                )
+
+            alle_hendelser.append((sorteringstid, event))
+
+    alle_hendelser.sort(key=lambda par: par[0])
 
     if not alle_hendelser:
         st.write("Ingen planer i dag 🎉")
     else:
-        for event in alle_hendelser:
+        for sorteringstid, event in alle_hendelser:
             start = event["start"].get("dateTime", event["start"].get("date"))
-            tid = datetime.fromisoformat(start).strftime("%H:%M") if "T" in start else "Hele dagen"
+            tid = sorteringstid.strftime("%H:%M") if "T" in start else "Hele dagen"
             st.write(f"**{tid}** – {event['summary']}")
