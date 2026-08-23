@@ -58,9 +58,15 @@ def vis_kalender():
     alle_hendelser.sort(key=lambda par: par[0])
 
     if not alle_hendelser:
-        st.write("Ingen planer i dag 🎉")
+        st.info("🎉 Ingen planer i dag")
     else:
         for sorteringstid, event in alle_hendelser:
             start = event["start"].get("dateTime", event["start"].get("date"))
             tid = sorteringstid.strftime("%H:%M") if "T" in start else "Hele dagen"
-            st.write(f"**{tid}** – {event['summary']}")
+
+            st.markdown(f"""
+                <div class="event-kort">
+                    <div class="event-tid">{tid}</div>
+                    <div class="event-navn">{event['summary']}</div>
+                </div>
+            """, unsafe_allow_html=True)

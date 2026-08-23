@@ -41,14 +41,47 @@ def vis_vaer():
 
     vaerdata_reset = vaerdata.reset_index().rename(columns={"index": "Klokkeslett"})
 
-    temp_graf = alt.Chart(vaerdata_reset).mark_line(point=True).encode(
+    farge_tekst = "#FAFAFA"
+    farge_grid = "rgba(255, 255, 255, 0.1)"
+
+    temp_graf = alt.Chart(vaerdata_reset).mark_line(
+        point=alt.OverlayMarkDef(color="#7C5CFC", size=50),
+        color="#7C5CFC",
+        strokeWidth=3
+    ).encode(
         x=alt.X("Klokkeslett", sort=None, axis=alt.Axis(labelAngle=0)),
-        y="Temperatur (°C)"
+        y=alt.Y("Temperatur (°C)")
+    ).properties(
+        background="transparent"
+    ).configure_axis(
+        labelColor=farge_tekst,
+        titleColor=farge_tekst,
+        gridColor=farge_grid,
+        domainColor=farge_grid
+    ).configure_view(
+        strokeWidth=0
     )
     st.altair_chart(temp_graf, use_container_width=True)
 
-    nedbor_graf = alt.Chart(vaerdata_reset).mark_bar().encode(
-        x=alt.X("Klokkeslett", sort=None, axis=alt.Axis(labelAngle=0)),
-        y="Nedbør (mm)"
-    )
-    st.altair_chart(nedbor_graf, use_container_width=True)
+    if sum(nedbor) > 0:
+        nedbor_graf = alt.Chart(vaerdata_reset).mark_bar(
+            color="#5CC8FC",
+            cornerRadiusTopLeft=4,
+            cornerRadiusTopRight=4
+        ).encode(
+            x=alt.X("Klokkeslett", sort=None, axis=alt.Axis(labelAngle=0)),
+            y=alt.Y("Nedbør (mm)")
+        ).properties(
+            background="transparent"
+        ).configure_axis(
+            labelColor=farge_tekst,
+            titleColor=farge_tekst,
+            gridColor=farge_grid,
+            domainColor=farge_grid
+        ).configure_view(
+            strokeWidth=0
+        )
+        st.altair_chart(nedbor_graf, use_container_width=True)
+    else:
+        st.info("☂️ Ingen nedbør meldt i dag")
+
