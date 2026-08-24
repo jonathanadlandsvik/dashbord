@@ -1,6 +1,6 @@
 import streamlit as st
 from datetime import datetime
-
+from zoneinfo import ZoneInfo
 from styling import last_css
 from vaer import vis_vaer
 from bysykkel import vis_bysykkel
@@ -12,7 +12,9 @@ st.set_page_config(page_title="Mitt dashbord", page_icon="📋", layout="centere
 last_css()
 
 st.title("God morgen!")
-st.caption(datetime.now().strftime("%A %d. %B %Y, kl %H:%M"))
+oslo = ZoneInfo("Europe/Oslo")
+naa = datetime.now(oslo)
+st.caption(naa.strftime("%A %d. %B %Y, kl %H:%M") + f" • uke {naa.isocalendar().week}")
 
 st.divider()
 

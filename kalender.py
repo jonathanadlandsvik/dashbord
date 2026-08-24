@@ -33,6 +33,9 @@ def vis_kalender():
     alle_hendelser = []
 
     for kalender in kalenderliste["items"]:
+        if kalender["summary"] in ["Ukenumre"]:
+            continue
+
         events_result = service.events().list(
             calendarId=kalender["id"],
             timeMin=start_of_day,

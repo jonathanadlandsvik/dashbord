@@ -43,7 +43,7 @@ def vis_trening():
 
         col1, col2 = st.columns(2)
         col1.metric("👟 Skritt", f"{steg:,.0f}".replace(",", " "))
-        col2.metric("🔴 Bevegelse", f"{bevegelse:.0f} kJ")
+        col2.metric("🔴 Bevegelse", f"{bevegelse:.0f} kcal")
 
         col3, col4 = st.columns(2)
         col3.metric("🟢 Trening", f"{trening:.0f} min")
