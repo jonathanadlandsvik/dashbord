@@ -2,10 +2,6 @@
 
 Et personlig dashbord bygget i Python og Streamlit som samler vær, bysykkeltilgjengelighet, kalenderavtaler og treningsdata fra Apple Watch på ett sted.
 
-🔗 **Live demo:** [morgendashbord.streamlit.app](https://dittnavn-dashbord.streamlit.app)
-
-![Skjermbilde av dashbordet](dashbord.png)
-
 ## Funksjonalitet
 
 - **☀️ Vær** – henter time-for-time temperatur og nedbør fra Yr (MET Norway sitt API), visualisert med interaktive grafer
@@ -29,19 +25,7 @@ Prosjektet består av tre deler:
 - **Lagring** – SQLite
 - **Deployment** – Streamlit Community Cloud, PythonAnywhere
 - **Versjonskontroll** – Git/GitHub
-
-## Kjøre lokalt
-
-```bash
-git clone https://github.com/jonathanadlandsvik/dashbord.git
-cd dashbord
-python3 -m venv venv
-source venv/bin/activate
-pip install -r requirements.txt
-streamlit run app.py
-```
-
-Krever egne API-nøkler for Google Calendar (`credentials.json`) og en `.streamlit/secrets.toml` med tilhørende tokens – se `kalender.py` for detaljer.
+  
 
 ## Bakgrunn
 
