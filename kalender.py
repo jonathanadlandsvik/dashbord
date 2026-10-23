@@ -2,24 +2,49 @@ import streamlit as st
 from datetime import datetime, timezone
 from zoneinfo import ZoneInfo
 from google.oauth2.credentials import Credentials
-from google.auth.transport.requests import Request
+from google.auth.exceptions import RefreshError
 from googleapiclient.discovery import build
+from googleapiclient.errors import HttpError
 
 
 def vis_kalender():
     st.header("📅 Planer i dag")
 
+    try:
+        hendelser = hent_dagens_hendelser()
+    except RefreshError:
+        st.error("Google-tokenet er utløpt eller trukket tilbake. Kjør `python hent_token.py` for å lage et nytt.")
+        return
+    except HttpError as feil:
+        st.error(f"Klarte ikke å hente kalenderen (HTTP {feil.status_code}).")
+        return
+
+    if not hendelser:
+        st.info("🎉 Ingen planer i dag")
+    else:
+        for sorteringstid, event in hendelser:
+            start = event["start"].get("dateTime", event["start"].get("date"))
+            tid = sorteringstid.strftime("%H:%M") if "T" in start else "Hele dagen"
+
+            st.markdown(f"""
+                <div class="event-kort">
+                    <div class="event-tid">{tid}</div>
+                    <div class="event-navn">{event.get('summary', '(uten tittel)')}</div>
+                </div>
+            """, unsafe_allow_html=True)
+
+
+def hent_dagens_hendelser():
+    # Vi lagrer bare refresh_token. Uten access token sørger Google-biblioteket
+    # selv for å hente et nytt et før første API-kall.
     creds = Credentials(
-        token=st.secrets["google"]["access_token"],
+        token=None,
         refresh_token=st.secrets["google"]["refresh_token"],
         token_uri="https://oauth2.googleapis.com/token",
         client_id=st.secrets["google"]["client_id"],
         client_secret=st.secrets["google"]["client_secret"],
         scopes=["https://www.googleapis.com/auth/calendar.readonly"]
     )
-
-    if creds.expired:
-        creds.refresh(Request())
 
     service = build("calendar", "v3", credentials=creds)
 
@@ -59,17 +84,4 @@ def vis_kalender():
             alle_hendelser.append((sorteringstid, event))
 
     alle_hendelser.sort(key=lambda par: par[0])
-
-    if not alle_hendelser:
-        st.info("🎉 Ingen planer i dag")
-    else:
-        for sorteringstid, event in alle_hendelser:
-            start = event["start"].get("dateTime", event["start"].get("date"))
-            tid = sorteringstid.strftime("%H:%M") if "T" in start else "Hele dagen"
-
-            st.markdown(f"""
-                <div class="event-kort">
-                    <div class="event-tid">{tid}</div>
-                    <div class="event-navn">{event['summary']}</div>
-                </div>
-            """, unsafe_allow_html=True)
+    return alle_hendelser
