@@ -18,7 +18,7 @@ Prosjektet består av tre deler:
 3. **Datakilder** – Yr og GBFS (åpne API-er), Google Calendar API (OAuth-autentisert), og Health Auto Export (iOS-app som eksporterer HealthKit-data)
 
 
-## Teknologier
+## Teknologgier
 
 - **Python** – Streamlit, Pandas, Altair, Flask, Requests
 - **API-er** – Yr/MET Norway, GBFS (Trondheim Bysykkel), Google Calendar API, egen REST API
