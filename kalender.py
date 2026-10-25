@@ -55,7 +55,7 @@ def hent_dagens_hendelser():
 
     kalenderliste = service.calendarList().list().execute()
 
-    alle_hendelser = []
+    alle_hendelser = 
 
     for kalender in kalenderliste["items"]:
         if kalender["summary"] in ["Ukenumre"]:
