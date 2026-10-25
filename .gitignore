@@ -4,3 +4,6 @@ venv/
 .DS_Store
 .streamlit/secrets.toml
 __pycache__/
+# Mottaker (PythonAnywhere)
+mottaker/.env
+*.db

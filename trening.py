@@ -1,50 +1,50 @@
 import streamlit as st
 import requests
-from datetime import datetime, date, timedelta
+from datetime import datetime, timedelta
+from zoneinfo import ZoneInfo
+
+API_URL = "https://jonathwa.pythonanywhere.com/helsedata"
 
 
-def hent_siste_treningsdata():
+@st.cache_data(ttl=600)
+def hent_treningsdata(dato):
+    """Henter tallene for én dag. Returnerer (data, feilmelding)."""
     try:
-        response = requests.get("https://jonathwa.pythonanywhere.com/siste")
-        if response.status_code == 200:
-            return response.json()
-        return None
+        response = requests.get(
+            f"{API_URL}/{dato}",
+            headers={"Authorization": f"Bearer {st.secrets['helse']['lese_nokkel']}"},
+            timeout=10,
+        )
     except requests.exceptions.RequestException:
-        return None
+        return None, "Får ikke kontakt med helse-API-et."
+
+    if response.status_code == 200:
+        return response.json(), None
+    if response.status_code == 404:
+        return None, "Ingen aktivitetsdata for i går ennå."
+    if response.status_code == 401:
+        return None, "Lesenøkkelen ble avvist – sjekk `[helse]` i secrets."
+    return None, f"Helse-API-et svarte med feil (HTTP {response.status_code})."
 
 
-def sum_metric_for_dag(metrics, navn, dag):
-    for metric in metrics:
-        if metric["name"] == navn:
-            total = 0
-            for punkt in metric["data"]:
-                punkt_dato = datetime.fromisoformat(punkt["date"]).date()
-                if punkt_dato == dag:
-                    total += punkt["qty"]
-            return total
-    return 0
+def vis_tall(verdi, format_):
+    return "–" if verdi is None else format_(verdi)
 
 
 def vis_trening():
     st.header("⌚ Aktivitet i går")
 
-    treningsdata = hent_siste_treningsdata()
-    i_gaar = date.today() - timedelta(days=1)
+    i_gaar = (datetime.now(ZoneInfo("Europe/Oslo")) - timedelta(days=1)).date()
+    data, feil = hent_treningsdata(i_gaar.isoformat())
 
-    if treningsdata is None:
-        st.write("Ingen treningsdata mottatt ennå")
-    else:
-        metrics = treningsdata["data"]["metrics"]
+    if feil:
+        st.info(feil)
+        return
 
-        steg = sum_metric_for_dag(metrics, "step_count", i_gaar)
-        bevegelse = sum_metric_for_dag(metrics, "active_energy", i_gaar)
-        trening = sum_metric_for_dag(metrics, "apple_exercise_time", i_gaar)
-        oppreist = sum_metric_for_dag(metrics, "apple_stand_hour", i_gaar)
+    col1, col2 = st.columns(2)
+    col1.metric("👟 Skritt", vis_tall(data["skritt"], lambda v: f"{v:,.0f}".replace(",", " ")))
+    col2.metric("🔴 Bevegelse", vis_tall(data["aktiv_energi"], lambda v: f"{v:.0f} kcal"))
 
-        col1, col2 = st.columns(2)
-        col1.metric("👟 Skritt", f"{steg:,.0f}".replace(",", " "))
-        col2.metric("🔴 Bevegelse", f"{bevegelse:.0f} kcal")
-
-        col3, col4 = st.columns(2)
-        col3.metric("🟢 Trening", f"{trening:.0f} min")
-        col4.metric("🔵 Oppreist", f"{oppreist:.0f} timer")
+    col3, col4 = st.columns(2)
+    col3.metric("🟢 Trening", vis_tall(data["treningsminutter"], lambda v: f"{v:.0f} min"))
+    col4.metric("🔵 Oppreist", vis_tall(data["oppreist_timer"], lambda v: f"{v:.0f} timer"))
