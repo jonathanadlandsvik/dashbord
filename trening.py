@@ -10,9 +10,14 @@ API_URL = "https://jonathwa.pythonanywhere.com/helsedata"
 def hent_treningsdata(dato):
     """Henter tallene for én dag. Returnerer (data, feilmelding)."""
     try:
+        lese_nokkel = st.secrets["helse"]["lese_nokkel"]
+    except KeyError:
+        return None, "Mangler `lese_nokkel` under `[helse]` i secrets."
+
+    try:
         response = requests.get(
             f"{API_URL}/{dato}",
-            headers={"Authorization": f"Bearer {st.secrets['helse']['lese_nokkel']}"},
+            headers={"Authorization": f"Bearer {lese_nokkel}"},
             timeout=10,
         )
     except requests.exceptions.RequestException:
@@ -47,4 +52,4 @@ def vis_trening():
 
     col3, col4 = st.columns(2)
     col3.metric("🟢 Trening", vis_tall(data["treningsminutter"], lambda v: f"{v:.0f} min"))
-    col4.metric("🔵 Oppreist", vis_tall(data["oppreist_timer"], lambda v: f"{v:.0f} timer"))
+    col4.metric("🔵 Oppreist", vis_tall(data.get("oppreist_minutter"), lambda v: f"{v:.0f} min"))

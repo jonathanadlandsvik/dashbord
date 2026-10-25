@@ -34,7 +34,7 @@ FELT = {
     "skritt": (0, 200_000),
     "aktiv_energi": (0, 20_000),      # kcal
     "treningsminutter": (0, 1_440),
-    "oppreist_timer": (0, 24),
+    "oppreist_minutter": (0, 1_440),
 }
 
 
@@ -49,10 +49,15 @@ def koble_til():
             skritt REAL,
             aktiv_energi REAL,
             treningsminutter REAL,
-            oppreist_timer REAL,
+            oppreist_minutter REAL,
             mottatt TEXT NOT NULL
         )
     """)
+    # Tabellen ble først laget med kolonnen oppreist_timer. Legg til den nye kolonnen
+    # hvis den mangler, slik at eksisterende database fortsatt fungerer.
+    kolonner = {rad["name"] for rad in conn.execute("PRAGMA table_info(dagsaktivitet)")}
+    if "oppreist_minutter" not in kolonner:
+        conn.execute("ALTER TABLE dagsaktivitet ADD COLUMN oppreist_minutter REAL")
     return conn
 
 
@@ -65,11 +70,32 @@ def har_gyldig_nokkel(miljovariabel):
         app.logger.error("Miljøvariabelen %s er ikke satt", miljovariabel)
         return False
 
-    header = request.headers.get("Authorization", "")
-    if not header.startswith("Bearer "):
-        return False
-    oppgitt = header.removeprefix("Bearer ").strip()
-    return hmac.compare_digest(oppgitt.encode(), forventet.encode())
+    # Nøkkelen kan sendes på to måter:
+    #   X-API-Key: <nøkkel>              (brukes av iPhone-snarveien)
+    #   Authorization: Bearer <nøkkel>   (brukes av dashbordet og curl)
+    # iOS kan fjerne Authorization-headeren, for eksempel ved videresending, mens en
+    # egendefinert header som X-API-Key alltid kommer frem.
+    oppgitt = request.headers.get("X-API-Key", "").strip()
+    if not oppgitt:
+        header = request.headers.get("Authorization", "")
+        if not header:
+            # Logg bare navnene på headerne, aldri verdiene
+            return avvis(f"mangler nøkkel (mottatte headere: {', '.join(sorted(request.headers.keys()))})")
+        if not header.startswith("Bearer "):
+            return avvis(f"Authorization starter ikke med 'Bearer ' (starter med {header[:7]!r})")
+        oppgitt = header.removeprefix("Bearer ").strip()
+
+    if not hmac.compare_digest(oppgitt.encode(), forventet.encode()):
+        # Logg bare lengden, aldri selve nøkkelen
+        return avvis(f"feil nøkkel for {miljovariabel} (lengde {len(oppgitt)}, forventet {len(forventet)})")
+    return True
+
+
+def avvis(grunn):
+    """Logger hvorfor en forespørsel ble avvist – nyttig både for feilsøking og for å oppdage angrep."""
+    app.logger.warning("Avvist %s %s fra %s: %s", request.method, request.path,
+                       request.headers.get("X-Real-IP", request.remote_addr), grunn)
+    return False
 
 
 def ikke_autorisert():
@@ -85,7 +111,10 @@ def tolk_tall(verdi):
     if isinstance(verdi, (int, float)):
         tall = float(verdi)
     elif isinstance(verdi, str):
-        tall = float(verdi.strip().replace(" ", "").replace(" ", "").replace(",", "."))
+        try:
+            tall = float(verdi.strip().replace(" ", "").replace(" ", "").replace(",", "."))
+        except ValueError:
+            raise ValueError("må være et tall") from None
     else:
         raise ValueError("må være et tall")
     if not math.isfinite(tall):
@@ -139,13 +168,13 @@ def motta_helsedata():
     with koble_til() as conn:
         # Én rad per dag: sender telefonen samme dag to ganger, blir raden oppdatert.
         conn.execute("""
-            INSERT INTO dagsaktivitet (dato, skritt, aktiv_energi, treningsminutter, oppreist_timer, mottatt)
-            VALUES (:dato, :skritt, :aktiv_energi, :treningsminutter, :oppreist_timer, :mottatt)
+            INSERT INTO dagsaktivitet (dato, skritt, aktiv_energi, treningsminutter, oppreist_minutter, mottatt)
+            VALUES (:dato, :skritt, :aktiv_energi, :treningsminutter, :oppreist_minutter, :mottatt)
             ON CONFLICT(dato) DO UPDATE SET
                 skritt = excluded.skritt,
                 aktiv_energi = excluded.aktiv_energi,
                 treningsminutter = excluded.treningsminutter,
-                oppreist_timer = excluded.oppreist_timer,
+                oppreist_minutter = excluded.oppreist_minutter,
                 mottatt = excluded.mottatt
         """, {**data, "mottatt": datetime.now(timezone.utc).isoformat()})
     conn.close()
@@ -164,7 +193,7 @@ def hent_helsedata(dato):
         return jsonify({"feil": "dato må være på formatet ÅÅÅÅ-MM-DD"}), 400
 
     with koble_til() as conn:
-        rad = conn.execute("SELECT * FROM dagsaktivitet WHERE dato = ?", (dato,)).fetchone()
+        rad = conn.execute("SELECT dato, skritt, aktiv_energi, treningsminutter, oppreist_minutter, mottatt FROM dagsaktivitet WHERE dato = ?", (dato,)).fetchone()
     conn.close()
 
     if rad is None:
