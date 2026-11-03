@@ -20,8 +20,30 @@ og avkryssing av daglige vaner om kvelden.
 Krever [uv](https://docs.astral.sh/uv/).
 
 ```bash
-uv sync                 # installerer Python 3.12 og avhengigheter i .venv
-cp .env.example .env    # fyll inn verdiene
-uv run pytest
-uv run ruff check .
+uv sync                                   # installerer Python 3.12 og avhengigheter i .venv
+cp .env.example .env                      # fyll inn verdiene
+uv run uvicorn app.main:app --reload      # http://localhost:8000
+```
+
+## Sjekker
+
+Kjøres også i GitHub Actions på hver push.
+
+```bash
+uv run ruff format .                      # formaterer koden
+uv run ruff check .                       # lint og sikkerhetsregler
+uv run pytest                             # tester
+```
+
+## Struktur
+
+```
+app/
+  main.py         inngangspunkt (lag_app)
+  config.py       miljøvariabler via pydantic-settings
+  routers/        sidene
+  services/       henting av data fra Yr, bysykkel og kalender
+  templates/      Jinja-maler
+public/static/    CSS og HTMX, servert fra Vercels CDN
+tests/
 ```

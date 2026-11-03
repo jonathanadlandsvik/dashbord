@@ -24,6 +24,7 @@ htmlcov/
 
 # Verktøy
 .vercel/
+.neon
 .DS_Store
 .vscode/*
 !.vscode/extensions.json

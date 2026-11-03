@@ -1,0 +1,12 @@
+# Dependabot leser denne filen fra standardbranchen (main), så den tar
+# effekt når v2 er merget inn i main.
+version: 2
+updates:
+  - package-ecosystem: "uv"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"

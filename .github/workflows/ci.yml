@@ -1,0 +1,32 @@
+name: CI
+
+on:
+  push:
+    branches: [main, v2]
+  pull_request:
+
+# Minste privilegium: jobben trenger bare å lese koden.
+permissions:
+  contents: read
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v6
+
+      - name: Installer avhengigheter (nøyaktig som i uv.lock)
+        run: uv sync --locked
+
+      - name: Formatering
+        run: uv run ruff format --check .
+
+      - name: Lint og sikkerhetsregler
+        run: uv run ruff check .
+
+      - name: Tester
+        run: uv run pytest
+
+      - name: Kjente sårbarheter i avhengigheter
+        run: uv run --with pip-audit pip-audit

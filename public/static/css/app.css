@@ -1,0 +1,96 @@
+/* Mobil først. Fargene er tokens, slik at lys og mørk modus deler alt annet. */
+:root {
+  --bakgrunn: #f2f3f7;
+  --flate: #ffffff;
+  --linje: #dcdfe8;
+  --tekst: #171a23;
+  --dempet: #5b6072;
+  --aksent: #5b46d6;
+  --radius: 14px;
+  --font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", sans-serif;
+  color-scheme: light;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bakgrunn: #0f1117;
+    --flate: #191c25;
+    --linje: #2a2e3b;
+    --tekst: #eceef4;
+    --dempet: #9a9fb2;
+    --aksent: #9d8cff;
+    color-scheme: dark;
+  }
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--bakgrunn);
+  color: var(--tekst);
+  font-family: var(--font);
+  font-size: 16px;
+  line-height: 1.45;
+  -webkit-text-size-adjust: 100%;
+}
+
+.side {
+  max-width: 560px;
+  margin: 0 auto;
+  padding-block: max(24px, env(safe-area-inset-top)) max(32px, env(safe-area-inset-bottom));
+  padding-left: max(16px, env(safe-area-inset-left));
+  padding-right: max(16px, env(safe-area-inset-right));
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.topp {
+  padding-block: 8px 12px;
+}
+
+h1 {
+  margin: 0;
+  font-size: 1.9rem;
+  letter-spacing: -0.02em;
+}
+
+.dato {
+  margin: 4px 0 0;
+  color: var(--dempet);
+}
+
+.uke {
+  margin-left: 6px;
+  padding: 1px 8px;
+  border-radius: 999px;
+  border: 1px solid var(--linje);
+  font-size: 0.8rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.boks {
+  background: var(--flate);
+  border: 1px solid var(--linje);
+  border-radius: var(--radius);
+  padding: 14px 16px;
+}
+
+h2 {
+  margin: 0;
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--aksent);
+}
+
+.kommer {
+  margin: 6px 0 0;
+  color: var(--dempet);
+}
