@@ -5,12 +5,10 @@ Appen bruker den pooled adressen (DATABASE_URL). Migrasjoner bruker den direkte
 """
 
 from collections.abc import Iterator
-from functools import lru_cache
 
+from fastapi import FastAPI, Request
 from sqlalchemy import Engine
 from sqlmodel import Session, create_engine
-
-from app.config import hent_settings
 
 # Neons pooler (PgBouncer) deler tilkoblinger mellom klienter. Da må psycopg ikke
 # lage navngitte prepared statements, som hører til én bestemt tilkobling.
@@ -36,15 +34,22 @@ def lag_engine(url: str) -> Engine:
     )
 
 
-@lru_cache
-def hent_engine() -> Engine:
-    settings = hent_settings()
-    if settings.database_url is None:
-        raise RuntimeError("DATABASE_URL er ikke satt")
-    return lag_engine(settings.database_url.get_secret_value())
+def hent_engine(app: FastAPI) -> Engine:
+    """Én engine per app, laget første gang den trengs, fra appens egne innstillinger.
+
+    Ikke fra en global konfigurasjon: da kunne testene (eller en app med andre
+    innstillinger) ende opp med å koble seg til databasen i .env.
+    """
+    engine = getattr(app.state, "engine", None)
+    if engine is None:
+        settings = app.state.settings
+        if settings.database_url is None:
+            raise RuntimeError("DATABASE_URL er ikke satt")
+        engine = app.state.engine = lag_engine(settings.database_url.get_secret_value())
+    return engine
 
 
-def hent_session() -> Iterator[Session]:
+def hent_session(request: Request) -> Iterator[Session]:
     """FastAPI-avhengighet: én databasesesjon per forespørsel."""
-    with Session(hent_engine()) as session:
+    with Session(hent_engine(request.app)) as session:
         yield session

@@ -306,10 +306,25 @@ def innlogget(session: Session):
     return klient
 
 
+@pytest.fixture
+def uinnlogget(session: Session):
+    app_ = lag_app(settings_for())
+    app_.dependency_overrides[hent_session] = lambda: session
+    return lag_testklient(app_)
+
+
 @pytest.mark.parametrize("boks", ["vaer", "bysykkel", "kalender"])
-def test_boksene_krever_innlogging(klient, boks):
-    svar = klient.get(f"/boks/{boks}", headers={"HX-Request": "true"})
+def test_boksene_krever_innlogging(uinnlogget, boks):
+    svar = uinnlogget.get(f"/boks/{boks}", headers={"HX-Request": "true"})
     assert svar.status_code == 401
+
+
+def test_appen_bruker_aldri_databasen_fra_env(klient):
+    """Uten DATABASE_URL i appens egne innstillinger skal den ikke finne en annen."""
+    from app.db import hent_engine
+
+    with pytest.raises(RuntimeError, match="DATABASE_URL"):
+        hent_engine(klient.app)
 
 
 def test_forsiden_laster_boksene_med_htmx(innlogget):
