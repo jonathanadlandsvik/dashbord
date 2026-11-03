@@ -1,9 +1,29 @@
+# Hemmeligheter – skal aldri i git
+.env
+.env.*
+!.env.example
 credentials.json
 token.json
-venv/
-.DS_Store
 .streamlit/secrets.toml
-__pycache__/
-# Mottaker (PythonAnywhere)
 mottaker/.env
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.pytest_cache/
+.ruff_cache/
+.coverage
+htmlcov/
+
+# Data
 *.db
+*.sqlite3
+*.dump
+
+# Verktøy
+.vercel/
+.DS_Store
+.vscode/*
+!.vscode/extensions.json
