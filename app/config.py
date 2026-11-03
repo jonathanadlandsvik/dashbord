@@ -31,6 +31,7 @@ class Settings(BaseSettings):
     vaer_lat: float = 63.4305
     vaer_lon: float = 10.3951
     bysykkel_stasjon_id: str = "293"
+    staatimer_mal: int = 12  # samme mål som ståringen på Apple Watch
 
     # Google Calendar (samme OAuth-klient og refresh token som i v1)
     google_client_id: str | None = None

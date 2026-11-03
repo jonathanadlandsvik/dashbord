@@ -20,7 +20,7 @@ GYLDIG = {
     "skritt": "8 123",
     "aktiv_energi": "412,5",
     "treningsminutter": 35,
-    "oppreist_minutter": 720,
+    "staatimer": "10",
 }
 
 
@@ -77,7 +77,7 @@ def test_lagrer_helsedata_med_x_api_key(api, nokkel, session):
         "skritt": 8123.0,
         "aktiv_energi": 412.5,
         "treningsminutter": 35.0,
-        "oppreist_minutter": 720.0,
+        "staatimer": 10.0,
     }
     assert session.exec(select(IngestNokkel)).one().sist_brukt is not None
 
@@ -132,6 +132,7 @@ def test_innloggingscookie_gir_ikke_tilgang_til_api(api, session):
         ({**GYLDIG, "skritt": 250_000}, "skritt"),
         ({**GYLDIG, "skritt": -1}, "skritt"),
         ({**GYLDIG, "skritt": True}, "skritt"),
+        ({**GYLDIG, "staatimer": 25}, "staatimer"),
         ({**GYLDIG, "dato": "2.11.2026"}, "dato"),
         ({**GYLDIG, "dato": (naa().date() + timedelta(days=3)).isoformat()}, "fremtiden"),
         ({"skritt": 1}, "dato"),
@@ -189,6 +190,7 @@ def test_aktivitetsboksen_viser_gaarsdagens_tall(session):
     assert "12 345" in svar.text  # i går, med mellomrom som tusenskille
     assert "99" not in svar.text  # i dag vises ikke
     assert svar.text.count("–") == 3  # de tre som mangler
+    assert "av 12" in svar.text  # ståmålet som på klokka
 
 
 def test_aktivitetsboksen_uten_data(innlogget_klient):
@@ -228,3 +230,21 @@ def test_importerer_helsedata_db_fra_v1(session, tmp_path):
     assert ("2026-10-30", "oppreist_minutter") not in rader  # NULL hoppes over
     assert rader[("2026-10-31", "oppreist_minutter")] == 700
     assert {r.kilde for r in session.exec(select(Dagsmaling)).all()} == {"v1-import"}
+
+
+def test_gamle_oppreist_minutter_godtas_fortsatt(api, nokkel, session):
+    """Den gamle snarvei-handlingen og historikken fra v1 sender fortsatt dette feltet."""
+    data = {"dato": "2026-11-02", "oppreist_minutter": 720}
+    assert api.post("/api/helsedata", json=data, headers={"X-API-Key": nokkel}).status_code == 200
+    assert malinger(session) == {"oppreist_minutter": 720.0}
+
+
+def test_aktivitetsboksen_viser_staatimer(innlogget_klient, session):
+    session.add(
+        Dagsmaling(dato=naa().date() - timedelta(days=1), maling="staatimer", verdi=9, kilde="t")
+    )
+    session.flush()
+    svar = innlogget_klient.get("/boks/aktivitet").text
+    assert "Ståtimer" in svar
+    assert "9<small> av 12" in svar
+    assert "Oppreist" not in svar

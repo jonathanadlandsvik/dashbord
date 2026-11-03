@@ -49,7 +49,7 @@ hash av den lagres.
 
 ```json
 {"dato": "2026-11-02", "skritt": 8123, "aktiv_energi": "412,5",
- "treningsminutter": 35, "oppreist_minutter": 720}
+ "treningsminutter": 35, "staatimer": 10}
 ```
 
 Nøkler håndteres fra terminalen:

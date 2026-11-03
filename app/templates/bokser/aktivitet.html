@@ -8,7 +8,7 @@
     <div><dt>Skritt</dt><dd>{{ tall(m.get("skritt")) }}</dd></div>
     <div><dt>Aktiv energi</dt><dd>{{ tall(m.get("aktiv_energi")) }}<small> kcal</small></dd></div>
     <div><dt>Trening</dt><dd>{{ tall(m.get("treningsminutter")) }}<small> min</small></dd></div>
-    <div><dt>Oppreist</dt><dd>{{ tall(m.get("oppreist_minutter")) }}<small> min</small></dd></div>
+    <div><dt>Ståtimer</dt><dd>{{ tall(m.get("staatimer")) }}<small> av {{ staamal }}</small></dd></div>
   </dl>
   {% else %}
   <p class="kommer">Ingen aktivitetsdata for i går ennå.</p>

@@ -4,7 +4,7 @@ Samme format og regler som mottakeren i v1, så snarveien bare trenger ny
 adresse og nøkkel:
 
     {"dato": "2026-11-02", "skritt": 8123, "aktiv_energi": "412,5",
-     "treningsminutter": 35, "oppreist_minutter": 720}
+     "treningsminutter": 35, "staatimer": 10}
 """
 
 import math
@@ -55,7 +55,8 @@ class Helsedata(BaseModel):
     skritt: Tall = Field(default=None, ge=0, le=200_000)
     aktiv_energi: Tall = Field(default=None, ge=0, le=20_000)  # kcal
     treningsminutter: Tall = Field(default=None, ge=0, le=1_440)
-    oppreist_minutter: Tall = Field(default=None, ge=0, le=1_440)
+    oppreist_minutter: Tall = Field(default=None, ge=0, le=1_440)  # fra v1, vises ikke lenger
+    staatimer: Tall = Field(default=None, ge=0, le=24)  # timer med minst ett minutt stående
 
     @field_validator("dato")
     @classmethod

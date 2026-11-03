@@ -71,8 +71,10 @@ async def kalender_boks(request: Request, _: Innlogget, settings: AppSettings) -
 
 
 @router.get("/aktivitet", response_class=HTMLResponse)
-def aktivitet(request: Request, _: Innlogget, db: DbSesjon) -> HTMLResponse:
+def aktivitet(request: Request, _: Innlogget, db: DbSesjon, settings: AppSettings) -> HTMLResponse:
     i_gaar = naa().date() - timedelta(days=1)
     rader = db.exec(select(Dagsmaling).where(Dagsmaling.dato == i_gaar)).all()
     malinger = {r.maling: r.verdi for r in rader}
-    return templates.TemplateResponse(request, "bokser/aktivitet.html", {"m": malinger})
+    return templates.TemplateResponse(
+        request, "bokser/aktivitet.html", {"m": malinger, "staamal": settings.staatimer_mal}
+    )
