@@ -12,6 +12,7 @@ permissions:
 jobs:
   test:
     runs-on: ubuntu-latest
+    timeout-minutes: 10  # et heng skal stoppe raskt, ikke kjøre i timevis
 
     # En egen Postgres bare for testene. Testene sletter og lager tabellene
     # på nytt, så de skal aldri kjøre mot Neon.

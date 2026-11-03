@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+
+{% block tittel %}{% if forste_gang %}Sett opp innlogging{% else %}Legg til passkey{% endif %} · Hverdagsdashbord{% endblock %}
+
+{% block innhold %}
+<header class="topp">
+  <h1>{% if forste_gang %}Sett opp innlogging{% else %}Legg til passkey{% endif %}</h1>
+  <p class="dato">
+    {% if forste_gang %}Registrer Face ID på denne enheten. Du trenger oppsettkoden fra Vercel.
+    {% else %}Registrer en ny enhet, for eksempel Macen din.{% endif %}
+  </p>
+</header>
+
+<section class="boks" id="registrering">
+  <form id="registrer-skjema" class="skjema">
+    {% if forste_gang %}
+    <label for="setup-token">Oppsettkode</label>
+    <input id="setup-token" name="setup_token" type="password" required autocomplete="off">
+    {% endif %}
+    <label for="navn">Navn på enheten</label>
+    <input id="navn" name="navn" value="iPhone" required maxlength="60">
+    <button class="knapp" type="submit">Registrer med Face ID</button>
+    <p class="melding" id="melding" role="status" aria-live="polite"></p>
+  </form>
+</section>
+
+<section class="boks" id="koder" hidden>
+  <h2>Gjenopprettingskoder</h2>
+  <p>Hver kode kan brukes én gang hvis du mister telefonen. De vises bare nå, så lagre dem et trygt sted, for eksempel som et sikkert notat i Passord-appen.</p>
+  <ol class="koder" id="kodeliste"></ol>
+  <a class="knapp" href="/">Jeg har lagret kodene</a>
+</section>
+
+{% if not forste_gang %}<p class="bunn"><a href="/">Tilbake</a></p>{% endif %}
+
+<script src="/static/js/passkey.js" defer></script>
+{% endblock %}

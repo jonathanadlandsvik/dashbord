@@ -30,4 +30,10 @@
   <h2>Kveldens vaner</h2>
   <p class="kommer">Kommer i fase 6</p>
 </section>
+
+<form method="post" action="/logg-ut" class="bunn">
+  <input type="hidden" name="csrf_token" value="{{ csrf }}">
+  <a href="/oppsett">Legg til passkey</a>
+  <button class="lenkeknapp" type="submit">Logg ut</button>
+</form>
 {% endblock %}

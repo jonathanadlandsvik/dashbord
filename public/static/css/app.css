@@ -94,3 +94,125 @@ h2 {
   margin: 6px 0 0;
   color: var(--dempet);
 }
+
+/* ---------- Skjemaer og knapper ---------- */
+
+.knapp {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+  min-height: 48px;
+  padding: 12px 16px;
+  border: 0;
+  border-radius: 12px;
+  background: var(--aksent);
+  color: #fff;
+  font: inherit;
+  font-weight: 600;
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.knapp.sekundar {
+  background: transparent;
+  color: var(--aksent);
+  border: 1px solid var(--linje);
+}
+
+.knapp:disabled {
+  opacity: 0.6;
+  cursor: progress;
+}
+
+.knapp:focus-visible,
+input:focus-visible,
+summary:focus-visible,
+.lenkeknapp:focus-visible,
+a:focus-visible {
+  outline: 2px solid var(--aksent);
+  outline-offset: 2px;
+}
+
+.skjema {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+label {
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+input {
+  min-height: 44px;
+  padding: 10px 12px;
+  border: 1px solid var(--linje);
+  border-radius: 10px;
+  background: var(--bakgrunn);
+  color: var(--tekst);
+  font: inherit;
+}
+
+summary {
+  cursor: pointer;
+  color: var(--dempet);
+}
+
+details[open] summary {
+  margin-bottom: 12px;
+}
+
+.melding:empty {
+  display: none;
+}
+
+.melding,
+.feil {
+  margin: 8px 0 0;
+  color: var(--dempet);
+}
+
+.feil,
+.melding.feil {
+  color: #c2364b;
+}
+
+@media (prefers-color-scheme: dark) {
+  .feil,
+  .melding.feil {
+    color: #ff8a9a;
+  }
+}
+
+.koder {
+  margin: 12px 0 16px;
+  padding-left: 1.6em;
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 1.05rem;
+  line-height: 1.8;
+  user-select: all;
+}
+
+.bunn {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 4px;
+  font-size: 0.9rem;
+}
+
+.bunn a,
+.lenkeknapp {
+  color: var(--dempet);
+}
+
+.lenkeknapp {
+  padding: 0;
+  border: 0;
+  background: none;
+  font: inherit;
+  text-decoration: underline;
+  cursor: pointer;
+}

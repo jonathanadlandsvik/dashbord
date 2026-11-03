@@ -12,20 +12,31 @@ from app.config import Settings
 from app.db import PSYCOPG_ARGS, til_sqlalchemy_url
 from app.main import lag_app
 
+HEMMELIG = "t" * 40
+
 
 def settings_for(**verdier) -> Settings:
     # _env_file=None: testene skal aldri lese den ekte .env-filen
-    return Settings(_env_file=None, **verdier)
+    standard = {"app_base_url": "http://testserver"}
+    if verdier.get("app_env") == "production":
+        standard = {"app_base_url": "https://testserver", "session_secret": HEMMELIG}
+    return Settings(_env_file=None, **(standard | verdier))
+
+
+def lag_testklient(app, *, https: bool = False) -> TestClient:
+    base = "https://testserver" if https else "http://testserver"
+    # Nettleseren sender Origin på POST. Testklienten må gjøre det samme.
+    return TestClient(app, base_url=base, headers={"Origin": base})
 
 
 @pytest.fixture
 def klient() -> TestClient:
-    return TestClient(lag_app(settings_for(app_env="development")))
+    return lag_testklient(lag_app(settings_for(app_env="development")))
 
 
 @pytest.fixture
 def prod_klient() -> TestClient:
-    return TestClient(lag_app(settings_for(app_env="production")))
+    return lag_testklient(lag_app(settings_for(app_env="production")), https=True)
 
 
 # ---------- Database ----------

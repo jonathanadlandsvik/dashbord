@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+
+{% block tittel %}Logg inn · Hverdagsdashbord{% endblock %}
+
+{% block innhold %}
+<header class="topp">
+  <h1>Logg inn</h1>
+</header>
+
+<section class="boks">
+  {% if har_passkeys %}
+  <button class="knapp" id="logg-inn-passkey" type="button">Logg inn med Face ID</button>
+  {% else %}
+  <p>Innloggingen er ikke satt opp ennå.</p>
+  <a class="knapp" href="/oppsett">Sett opp innlogging</a>
+  {% endif %}
+  <p class="melding" id="melding" role="status" aria-live="polite"></p>
+</section>
+
+{% if har_passkeys %}
+<details class="boks"{% if kodefeil %} open{% endif %}>
+  <summary>Mistet telefonen? Bruk en gjenopprettingskode</summary>
+  <form method="post" action="/logg-inn/kode" class="skjema">
+    <label for="kode">Gjenopprettingskode</label>
+    <input id="kode" name="kode" required maxlength="40" placeholder="ABCD-EFGH-JKMN"
+           autocomplete="one-time-code" autocapitalize="characters" spellcheck="false">
+    {% if kodefeil %}<p class="feil">Koden er ugyldig eller allerede brukt.</p>{% endif %}
+    <button class="knapp sekundar" type="submit">Logg inn med kode</button>
+  </form>
+</details>
+{% endif %}
+
+<script src="/static/js/passkey.js" defer></script>
+{% endblock %}

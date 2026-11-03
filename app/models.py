@@ -95,3 +95,67 @@ class Dagsmaling(SQLModel, table=True):
     verdi: float
     kilde: str = Field(max_length=40)
     mottatt: datetime | None = Field(default=None, sa_column=_tidsstempel())
+
+
+# ---------- Innlogging (fase 3) ----------
+# Appen har én bruker, så det finnes ingen brukertabell. Hemmeligheter lagres
+# aldri i klartekst: sesjoner, utfordringer og gjenopprettingskoder lagres som
+# SHA-256 av en tilfeldig verdi, og bare brukeren har selve verdien.
+
+
+class Passkey(SQLModel, table=True):
+    """En registrert passkey, for eksempel Face ID på iPhonen."""
+
+    __tablename__ = "passkeys"
+
+    id: bytes = Field(primary_key=True)  # credential id fra autentikatoren
+    offentlig_nokkel: bytes
+    signaturteller: int = 0
+    navn: str = Field(max_length=60)
+    opprettet: datetime | None = Field(default=None, sa_column=_tidsstempel())
+    sist_brukt: datetime | None = Field(default=None, sa_type=DateTime(timezone=True))
+
+
+class Sesjon(SQLModel, table=True):
+    """En innlogget nettleser. Cookien har tokenet, databasen bare hashen."""
+
+    __tablename__ = "sesjoner"
+
+    token_hash: str = Field(primary_key=True, max_length=64)
+    opprettet: datetime | None = Field(default=None, sa_column=_tidsstempel())
+    utloper: datetime = Field(sa_type=DateTime(timezone=True))
+    sist_sett: datetime = Field(sa_type=DateTime(timezone=True))
+
+
+class Utfordring(SQLModel, table=True):
+    """En WebAuthn-challenge som kan brukes én gang, innen noen minutter."""
+
+    __tablename__ = "utfordringer"
+    __table_args__ = (
+        CheckConstraint("formal IN ('registrering', 'innlogging')", name="formal_gyldig"),
+    )
+
+    token_hash: str = Field(primary_key=True, max_length=64)
+    challenge: bytes
+    formal: str = Field(max_length=20)
+    utloper: datetime = Field(sa_type=DateTime(timezone=True))
+
+
+class Gjenopprettingskode(SQLModel, table=True):
+    """Engangskoder i tilfelle telefonen blir borte."""
+
+    __tablename__ = "gjenopprettingskoder"
+
+    kode_hash: str = Field(primary_key=True, max_length=64)
+    opprettet: datetime | None = Field(default=None, sa_column=_tidsstempel())
+    brukt: datetime | None = Field(default=None, sa_type=DateTime(timezone=True))
+
+
+class Innloggingsforsok(SQLModel, table=True):
+    """Mislykkede forsøk, brukt til å bremse gjetting."""
+
+    __tablename__ = "innloggingsforsok"
+
+    id: int | None = Field(default=None, primary_key=True)
+    tidspunkt: datetime | None = Field(default=None, sa_column=_tidsstempel())
+    metode: str = Field(max_length=20)

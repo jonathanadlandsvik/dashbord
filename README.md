@@ -26,6 +26,21 @@ uv run alembic upgrade head               # oppdaterer dev-databasen til nyeste 
 uv run uvicorn app.main:app --reload      # http://localhost:8000
 ```
 
+## Innlogging
+
+Innloggingen bruker passkeys (Face ID). Appen har én bruker.
+
+1. Første gang: sett `SETUP_TOKEN` (et langt, tilfeldig passord) i miljøvariablene, åpne
+   `/oppsett` og registrer Face ID med den koden. Du får ti gjenopprettingskoder, som
+   bare vises én gang.
+2. Slett `SETUP_TOKEN` etterpå. Den virker uansett ikke etter at første passkey finnes.
+3. Nye enheter legges til fra `/oppsett` mens du er innlogget.
+4. Mister du telefonen, logger du inn med en gjenopprettingskode og registrerer en ny passkey.
+
+Sikkerhet: sesjoner og koder lagres bare som SHA-256 i databasen, alle skjemaer har
+CSRF-token, endrende forespørsler må komme fra appens egen adresse (Origin-sjekk),
+og innlogging sperres et kvarter etter ti mislykkede forsøk.
+
 ## Database og migrasjoner
 
 Tabellene er definert i `app/models.py`, og hver endring får en migrasjon i

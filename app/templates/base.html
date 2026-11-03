@@ -4,11 +4,14 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <meta name="color-scheme" content="light dark">
+  <meta name="csrf-token" content="{{ csrf | default('') }}">
+  {# HTMX skal ikke legge inn egne stiler eller kjøre eval, så CSP-en kan være streng. #}
+  <meta name="htmx-config" content='{"includeIndicatorStyles": false, "allowEval": false}'>
   <title>{% block tittel %}Hverdagsdashbord{% endblock %}</title>
   <link rel="stylesheet" href="/static/css/app.css">
   <script src="/static/js/htmx-2.0.4.min.js" defer></script>
 </head>
-<body>
+<body{% if csrf %} hx-headers='{"X-CSRF-Token": "{{ csrf }}"}'{% endif %}>
   <main class="side">
     {% block innhold %}{% endblock %}
   </main>
