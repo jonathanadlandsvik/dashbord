@@ -22,7 +22,26 @@ Krever [uv](https://docs.astral.sh/uv/).
 ```bash
 uv sync                                   # installerer Python 3.12 og avhengigheter i .venv
 cp .env.example .env                      # fyll inn verdiene
+uv run alembic upgrade head               # oppdaterer dev-databasen til nyeste versjon
 uv run uvicorn app.main:app --reload      # http://localhost:8000
+```
+
+## Database og migrasjoner
+
+Tabellene er definert i `app/models.py`, og hver endring får en migrasjon i
+`migrations/versions/`. Migrasjoner bruker den direkte adressen
+(`DATABASE_URL_UNPOOLED`), appen bruker den pooled (`DATABASE_URL`).
+
+```bash
+uv run alembic current                    # hvilken versjon databasen er på
+uv run alembic upgrade head               # kjør nye migrasjoner mot dev
+uv run alembic revision -m "beskrivelse"  # lag en ny, tom migrasjon
+```
+
+Mot production (henter adressen fra Neon uten å vise den):
+
+```bash
+DATABASE_URL_UNPOOLED="$(npx neon@latest connection-string production)" uv run alembic upgrade head
 ```
 
 ## Sjekker
@@ -32,8 +51,11 @@ Kjøres også i GitHub Actions på hver push.
 ```bash
 uv run ruff format .                      # formaterer koden
 uv run ruff check .                       # lint og sikkerhetsregler
-uv run pytest                             # tester
+uv run pytest                             # tester (databasetestene hoppes over uten TEST_DATABASE_URL)
 ```
+
+Databasetestene trenger en egen, tom Postgres i `TEST_DATABASE_URL`. I GitHub Actions
+startes en Postgres-container automatisk. Pek den aldri på Neon: testene sletter tabellene.
 
 ## Struktur
 
@@ -41,9 +63,12 @@ uv run pytest                             # tester
 app/
   main.py         inngangspunkt (lag_app)
   config.py       miljøvariabler via pydantic-settings
+  db.py           tilkobling til Postgres
+  models.py       tabellene
   routers/        sidene
   services/       henting av data fra Yr, bysykkel og kalender
   templates/      Jinja-maler
+migrations/       Alembic-migrasjoner
 public/static/    CSS og HTMX, servert fra Vercels CDN
 tests/
 ```

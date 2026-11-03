@@ -1,12 +1,20 @@
 """Inngangspunktet. Vercel laster `app` herfra (se [tool.vercel] i pyproject.toml)."""
 
+import logging
 from pathlib import Path
+from typing import Annotated
 
-from fastapi import FastAPI
+from fastapi import Depends, FastAPI
+from fastapi.responses import JSONResponse
 from fastapi.staticfiles import StaticFiles
+from sqlalchemy import text
+from sqlmodel import Session
 
 from app.config import Settings, hent_settings
+from app.db import hent_session
 from app.routers import forside
+
+logger = logging.getLogger(__name__)
 
 PUBLIC = Path(__file__).resolve().parent.parent / "public"
 
@@ -31,6 +39,16 @@ def lag_app(settings: Settings) -> FastAPI:
     @app.get("/healthz", include_in_schema=False)
     def healthz() -> dict[str, str]:
         return {"status": "ok"}
+
+    @app.get("/healthz/db", include_in_schema=False)
+    def healthz_db(session: Annotated[Session, Depends(hent_session)]) -> JSONResponse:
+        try:
+            session.exec(text("SELECT 1"))
+        except Exception:
+            # Detaljene havner i loggen hos Vercel, aldri i svaret til nettleseren.
+            logger.exception("Databasesjekken feilet")
+            return JSONResponse({"database": "utilgjengelig"}, status_code=503)
+        return JSONResponse({"database": "ok"})
 
     return app
 
