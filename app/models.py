@@ -15,7 +15,7 @@ from sqlalchemy import (
     UniqueConstraint,
     func,
 )
-from sqlalchemy.dialects.postgresql import ARRAY
+from sqlalchemy.dialects.postgresql import ARRAY, JSONB
 from sqlmodel import Field, SQLModel
 
 ALLE_DAGER = [0, 1, 2, 3, 4, 5, 6]  # 0 = mandag, som i Pythons date.weekday()
@@ -159,3 +159,22 @@ class Innloggingsforsok(SQLModel, table=True):
     id: int | None = Field(default=None, primary_key=True)
     tidspunkt: datetime | None = Field(default=None, sa_column=_tidsstempel())
     metode: str = Field(max_length=20)
+
+
+# ---------- Cache for eksterne tjenester (fase 4) ----------
+
+
+class ApiCache(SQLModel, table=True):
+    """Siste svar fra en ekstern tjeneste, så vi ikke spør oftere enn nødvendig.
+
+    Yr (MET) krever at klienter respekterer Expires og bruker If-Modified-Since.
+    På Vercel husker ikke funksjonen noe mellom kall, så cachen må ligge her.
+    """
+
+    __tablename__ = "api_cache"
+
+    nokkel: str = Field(primary_key=True, max_length=100)
+    innhold: dict = Field(sa_column=Column(JSONB, nullable=False))
+    utloper: datetime = Field(sa_type=DateTime(timezone=True))
+    sist_endret: str | None = Field(default=None, max_length=64)  # Last-Modified fra tjenesten
+    hentet: datetime | None = Field(default=None, sa_column=_tidsstempel())

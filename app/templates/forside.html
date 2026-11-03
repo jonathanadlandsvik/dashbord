@@ -6,19 +6,20 @@
   <p class="dato">{{ dato }} <span class="uke">uke {{ uke }}</span></p>
 </header>
 
-<section class="boks">
+{# Hver boks hentes for seg når siden er lastet. Til da vises en plassholder. #}
+<section class="boks" hx-get="/boks/vaer" hx-trigger="load" hx-swap="outerHTML">
   <h2>Vær</h2>
-  <p class="kommer">Kommer i fase 4</p>
+  <p class="kommer">Henter …</p>
 </section>
 
-<section class="boks">
+<section class="boks" hx-get="/boks/bysykkel" hx-trigger="load" hx-swap="outerHTML">
   <h2>Bysykkel</h2>
-  <p class="kommer">Kommer i fase 4</p>
+  <p class="kommer">Henter …</p>
 </section>
 
-<section class="boks">
-  <h2>Kalender</h2>
-  <p class="kommer">Kommer i fase 4</p>
+<section class="boks" hx-get="/boks/kalender" hx-trigger="load" hx-swap="outerHTML">
+  <h2>Kalender i dag</h2>
+  <p class="kommer">Henter …</p>
 </section>
 
 <section class="boks">

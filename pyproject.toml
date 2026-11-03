@@ -7,6 +7,7 @@ requires-python = ">=3.12,<3.13"
 dependencies = [
     "alembic>=1.14",
     "fastapi>=0.115",
+    "httpx>=0.28",
     "jinja2>=3.1",
     "psycopg[binary]>=3.2",
     "pydantic-settings>=2.6",
@@ -19,6 +20,7 @@ dependencies = [
 dev = [
     "httpx2",           # brukes av FastAPIs TestClient
     "pytest>=8",
+    "respx>=0.22",
     "ruff>=0.6",
     "uvicorn>=0.32",    # lokal utviklingsserver
 ]

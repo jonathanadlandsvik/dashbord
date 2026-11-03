@@ -1,0 +1,13 @@
+<section class="boks">
+  <h2>Kalender i dag</h2>
+  {% if hendelser %}
+  <ul class="avtaler">
+    {% for h in hendelser %}
+    {# Tittelen escapes automatisk av Jinja. I v1 ble den satt rett inn i HTML. #}
+    <li><span class="tid">{{ h.tid }}</span> <span>{{ h.tittel }}</span></li>
+    {% endfor %}
+  </ul>
+  {% else %}
+  <p class="kommer">Ingen avtaler i dag.</p>
+  {% endif %}
+</section>

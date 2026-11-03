@@ -1,0 +1,24 @@
+<section class="boks vaer">
+  <h2>Vær</h2>
+  <div class="naa">
+    <span class="temp">{{ "%.0f" | format(vaer.temperatur) }}°</span>
+    <span class="beskrivelse">{{ vaer.beskrivelse }}<br>
+      <span class="dempet">Vind {{ "%.0f" | format(vaer.vind) }} m/s</span>
+    </span>
+  </div>
+  <p class="oppsummering">
+    {% if vaer.nedbor_6t > 0 %}{{ ("%.1f" | format(vaer.nedbor_6t)).replace(".", ",") }} mm nedbør de neste 6 timene
+    {% else %}Opphold de neste 6 timene{% endif %}
+  </p>
+  <ol class="timer" aria-label="Time for time">
+    {% for t in vaer.timer %}
+    <li{% if t.nedbor > 0 %} class="vaat"{% endif %}>
+      <span class="klokke">{{ t.klokke }}</span>
+      <span class="t">{{ "%.0f" | format(t.temperatur) }}°</span>
+      <span class="mm">{% if t.nedbor > 0 %}{{ ("%.1f" | format(t.nedbor)).replace(".", ",") }}{% else %}–{% endif %}</span>
+    </li>
+    {% endfor %}
+  </ol>
+  {% if vaer.utdatert %}<p class="dempet liten">Yr svarer ikke. Viser forrige værmelding.</p>{% endif %}
+  <p class="kilde">Kilde: Yr / MET Norway</p>
+</section>

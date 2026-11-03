@@ -32,6 +32,11 @@ class Settings(BaseSettings):
     vaer_lon: float = 10.3951
     bysykkel_stasjon_id: str = "293"
 
+    # Google Calendar (samme OAuth-klient og refresh token som i v1)
+    google_client_id: str | None = None
+    google_client_secret: SecretStr | None = None
+    google_refresh_token: SecretStr | None = None
+
     @property
     def er_produksjon(self) -> bool:
         return self.app_env == "production"

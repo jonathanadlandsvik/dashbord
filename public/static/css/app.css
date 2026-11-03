@@ -216,3 +216,120 @@ details[open] summary {
   text-decoration: underline;
   cursor: pointer;
 }
+
+/* ---------- Boksene ---------- */
+
+.dempet {
+  color: var(--dempet);
+}
+
+.liten,
+.kilde {
+  font-size: 0.8rem;
+}
+
+.kilde {
+  margin: 8px 0 0;
+  color: var(--dempet);
+}
+
+.vaer .naa {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-top: 8px;
+}
+
+.vaer .temp {
+  font-size: 2.6rem;
+  font-weight: 650;
+  letter-spacing: -0.03em;
+  font-variant-numeric: tabular-nums;
+}
+
+.oppsummering {
+  margin: 8px 0 10px;
+}
+
+.timer {
+  display: flex;
+  gap: 4px;
+  margin: 0;
+  padding: 0 0 4px;
+  list-style: none;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.timer li {
+  flex: 0 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-width: 42px;
+  padding: 6px 4px;
+  border-radius: 10px;
+  font-variant-numeric: tabular-nums;
+}
+
+.timer li.vaat {
+  background: color-mix(in srgb, var(--aksent) 12%, transparent);
+}
+
+.timer .klokke,
+.timer .mm {
+  font-size: 0.75rem;
+  color: var(--dempet);
+}
+
+.timer .t {
+  font-weight: 600;
+}
+
+.tall {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  margin: 10px 0 0;
+}
+
+.tall div {
+  display: flex;
+  flex-direction: column-reverse;
+}
+
+.tall dt {
+  font-size: 0.8rem;
+  color: var(--dempet);
+}
+
+.tall dd {
+  margin: 0;
+  font-size: 1.8rem;
+  font-weight: 650;
+  font-variant-numeric: tabular-nums;
+}
+
+.avtaler {
+  margin: 8px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.avtaler li {
+  display: flex;
+  gap: 12px;
+  padding: 8px 0;
+  border-top: 1px solid var(--linje);
+}
+
+.avtaler li:first-child {
+  border-top: 0;
+}
+
+.avtaler .tid {
+  flex: 0 0 5.6em; /* plass til «Hele dagen», så titlene står på linje */
+  font-weight: 600;
+  color: var(--aksent);
+  font-variant-numeric: tabular-nums;
+}

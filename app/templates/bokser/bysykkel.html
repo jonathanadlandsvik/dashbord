@@ -1,0 +1,12 @@
+<section class="boks" hx-get="/boks/bysykkel" hx-trigger="every 60s" hx-swap="outerHTML">
+  <h2>Bysykkel · {{ stasjon.navn }}</h2>
+  {% if not stasjon.i_drift %}
+  <p class="kommer">Stasjonen er stengt for utleie nå.</p>
+  {% else %}
+  <dl class="tall">
+    <div><dt>Sykler</dt><dd>{{ stasjon.sykler }}</dd></div>
+    <div><dt>El-sykler</dt><dd>{{ stasjon.elsykler }}</dd></div>
+    <div><dt>Ledige låser</dt><dd>{{ stasjon.ledige_plasser }}</dd></div>
+  </dl>
+  {% endif %}
+</section>
