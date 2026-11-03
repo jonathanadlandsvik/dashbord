@@ -1,0 +1,28 @@
+<h2>Uke {{ ukestart.isocalendar().week }}</h2>
+{% if uke %}
+<div class="tabellramme">
+<table class="ukegrid">
+  <thead>
+    <tr><th scope="col"><span class="skjult">Vane</span></th>
+      {% for bokstav in ["M", "T", "O", "T", "F", "L", "S"] %}<th scope="col">{{ bokstav }}</th>{% endfor %}
+      <th scope="col"><span class="skjult">Status</span></th></tr>
+  </thead>
+  <tbody>
+    {% for s in uke %}
+    <tr>
+      <th scope="row">{{ s.vane.navn }}</th>
+      {% for dag, g in s.dager %}
+      <td>{% if g is none %}<span class="prikk gjelder-ikke" title="Gjelder ikke denne dagen"></span>
+        {%- elif g %}<span class="prikk gjort" title="Gjort"></span>
+        {%- elif dag > i_dag %}<span class="prikk fremtid"></span>
+        {%- else %}<span class="prikk" title="Ikke gjort"></span>{% endif %}</td>
+      {% endfor %}
+      <td><span class="chip {{ {'nådd': 'nadd', 'mulig': 'mulig', 'ikke nådd': 'ikke'}[s.tilstand] }}" title="{{ s.tilstand | capitalize }}">{{ s.antall }}/{{ s.mal }}</span></td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+</div>
+{% else %}
+<p class="kommer">Ingen vaner denne uka.</p>
+{% endif %}

@@ -14,7 +14,7 @@ from sqlmodel import Session
 from app.auth import IkkeInnlogget, Ugyldig
 from app.config import Settings, hent_settings
 from app.db import hent_session
-from app.routers import api, bokser, forside, innlogging
+from app.routers import api, bokser, forside, innlogging, vaner
 from app.sikkerhet import Sikkerhetsmiddleware
 
 logger = logging.getLogger(__name__)
@@ -66,6 +66,7 @@ def lag_app(settings: Settings) -> FastAPI:
     app.include_router(forside.router)
     app.include_router(bokser.router)
     app.include_router(api.router)
+    app.include_router(vaner.router)
 
     @app.get("/healthz", include_in_schema=False)
     def healthz() -> dict[str, str]:

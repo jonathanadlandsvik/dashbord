@@ -1,0 +1,59 @@
+{% extends "base.html" %}
+
+{% block tittel %}Vaner · Hverdagsdashbord{% endblock %}
+
+{% block innhold %}
+<header class="topp">
+  <p class="tilbake"><a href="/">‹ Forsiden</a></p>
+  <h1>Vaner</h1>
+</header>
+
+<section class="boks" id="dagen">
+  <div class="dagnav">
+    {% if forrige %}<a href="/vaner?dato={{ forrige.isoformat() }}" aria-label="Forrige dag">‹</a>{% else %}<span></span>{% endif %}
+    <h2>{% if dag == i_dag %}I dag{% else %}{{ dag | kort_dato }}{% endif %}</h2>
+    {% if neste %}<a href="/vaner?dato={{ neste.isoformat() }}" aria-label="Neste dag">›</a>{% else %}<span></span>{% endif %}
+  </div>
+  {% include "vaner/antall.html" %}
+  {% if vaner %}
+  <ul class="vaneliste">
+    {% for v in vaner %}<li>{% include "vaner/rad.html" %}</li>{% endfor %}
+  </ul>
+  {% else %}
+  <p class="kommer">Ingen vaner gjelder denne dagen.</p>
+  {% endif %}
+</section>
+
+<section class="boks" id="uka">
+  {% include "vaner/uke.html" %}
+</section>
+
+<section class="boks" id="oppsummering">
+  {% include "vaner/oppsummering.html" %}
+</section>
+
+<section class="boks">
+  <h2>Siste uker</h2>
+  <table class="historikk">
+    <thead><tr><th scope="col">Uke</th><th scope="col">Vanemål</th><th scope="col">Skjermtid</th></tr></thead>
+    <tbody>
+      {% for u in historikk %}
+      <tr{% if u.start == ukestart %} class="valgt"{% endif %}>
+        <th scope="row">{{ u.start.isocalendar().week }}</th>
+        <td>
+          {% if u.prosent is none %}<span class="dempet">–</span>{% else %}
+          <svg class="stolpe" viewBox="0 0 100 8" preserveAspectRatio="none" aria-hidden="true">
+            <rect class="bakgrunn" x="0" y="0" width="100" height="8" rx="4"/>
+            <rect class="fyll" x="0" y="0" width="{{ u.prosent }}" height="8" rx="4"/>
+          </svg>
+          <span class="prosent">{{ u.prosent }} %</span>{% endif %}
+        </td>
+        <td class="{% if u.skjermtid is not none and u.skjermtid > skjermtid_mal %}over{% elif u.skjermtid is not none %}under{% endif %}">
+          {% if u.skjermtid is none %}–{% else %}{{ u.skjermtid | komma }} t{% endif %}
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+</section>
+{% endblock %}

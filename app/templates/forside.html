@@ -27,9 +27,9 @@
   <p class="kommer">Henter …</p>
 </section>
 
-<section class="boks">
-  <h2>Kveldens vaner</h2>
-  <p class="kommer">Kommer i fase 6</p>
+<section class="boks" hx-get="/boks/vaner" hx-trigger="load" hx-swap="outerHTML">
+  <h2>Vaner</h2>
+  <p class="kommer">Henter …</p>
 </section>
 
 <form method="post" action="/logg-ut" class="bunn">

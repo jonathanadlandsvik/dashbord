@@ -1,0 +1,4 @@
+{# Svaret på en avkrysning: knappen selv, pluss telleren og uka som oppdateres ved siden av (OOB). #}
+{% include "vaner/rad.html" %}
+{% with oob = true %}{% include "vaner/antall.html" %}{% endwith %}
+<div id="uka" hx-swap-oob="innerHTML">{% include "vaner/uke.html" %}</div>

@@ -344,3 +344,319 @@ details[open] summary {
   font-weight: 500;
   color: var(--dempet);
 }
+
+/* ---------- Vaner ---------- */
+
+.tilbake {
+  margin: 0 0 6px;
+  font-size: 0.9rem;
+}
+
+.tilbake a,
+.dagnav a {
+  color: var(--dempet);
+  text-decoration: none;
+}
+
+.dagnav {
+  display: grid;
+  grid-template-columns: 44px 1fr 44px;
+  align-items: center;
+  text-align: center;
+}
+
+.dagnav a {
+  display: grid;
+  place-items: center;
+  min-height: 44px;
+  font-size: 1.4rem;
+}
+
+#dagens-antall {
+  margin: 2px 0 8px;
+  text-align: center;
+  font-size: 0.9rem;
+}
+
+.vaneliste {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.vaneliste li + li {
+  border-top: 1px solid var(--linje);
+}
+
+.vane {
+  display: grid;
+  grid-template-columns: 30px 1fr;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+  min-height: 60px;
+  padding: 10px 2px;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.vane:focus-visible {
+  outline: 2px solid var(--aksent);
+  outline-offset: 2px;
+  border-radius: 8px;
+}
+
+.hake {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border: 2px solid var(--linje);
+  border-radius: 8px;
+  transition: background 0.15s, border-color 0.15s;
+}
+
+.hake svg {
+  width: 16px;
+  height: 16px;
+  fill: none;
+  stroke: var(--flate);
+  stroke-width: 3;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  opacity: 0;
+}
+
+.vane.gjort .hake {
+  background: var(--aksent);
+  border-color: var(--aksent);
+}
+
+.vane.gjort .hake svg {
+  opacity: 1;
+}
+
+.vane.htmx-request {
+  opacity: 0.6;
+}
+
+.vanetekst {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+}
+
+.vanetekst .navn {
+  font-weight: 600;
+}
+
+.vanetekst .formulering {
+  color: var(--dempet);
+  font-size: 0.85rem;
+}
+
+.tabellramme {
+  overflow-x: auto;
+}
+
+.ukegrid,
+.historikk {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 8px;
+  font-size: 0.85rem;
+}
+
+.ukegrid th,
+.ukegrid td {
+  padding: 6px 2px;
+  text-align: center;
+}
+
+.ukegrid thead th {
+  color: var(--dempet);
+  font-weight: 600;
+}
+
+.ukegrid tbody th {
+  text-align: left;
+  font-weight: 500;
+  white-space: nowrap;
+  padding-right: 8px;
+}
+
+.ukegrid tbody tr + tr {
+  border-top: 1px solid var(--linje);
+}
+
+.prikk {
+  display: inline-block;
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  border: 2px solid var(--linje);
+}
+
+.prikk.gjort {
+  background: var(--aksent);
+  border-color: var(--aksent);
+}
+
+.prikk.fremtid {
+  border-style: dashed;
+  opacity: 0.6;
+}
+
+.prikk.gjelder-ikke {
+  border: 0;
+  width: 6px;
+  height: 2px;
+  border-radius: 0;
+  background: var(--linje);
+  vertical-align: middle;
+}
+
+.chip {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 650;
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+.chip.nadd {
+  background: color-mix(in srgb, #2f8f57 18%, transparent);
+  color: #2f8f57;
+}
+
+.chip.mulig {
+  background: color-mix(in srgb, #b07a12 18%, transparent);
+  color: #b07a12;
+}
+
+.chip.ikke {
+  background: color-mix(in srgb, #c2364b 16%, transparent);
+  color: #c2364b;
+}
+
+@media (prefers-color-scheme: dark) {
+  .chip.nadd {
+    color: #6fd39a;
+  }
+
+  .chip.mulig {
+    color: #f0b851;
+  }
+
+  .chip.ikke {
+    color: #ff8a9a;
+  }
+}
+
+.skjult {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+textarea {
+  padding: 10px 12px;
+  border: 1px solid var(--linje);
+  border-radius: 10px;
+  background: var(--bakgrunn);
+  color: var(--tekst);
+  font: inherit;
+  resize: vertical;
+}
+
+.hjelp {
+  margin: -4px 0 6px;
+  font-size: 0.8rem;
+  color: var(--dempet);
+}
+
+.historikk th,
+.historikk td {
+  padding: 8px 4px;
+  text-align: left;
+  font-variant-numeric: tabular-nums;
+}
+
+.historikk thead th {
+  color: var(--dempet);
+  font-weight: 600;
+  font-size: 0.75rem;
+}
+
+.historikk tbody tr + tr {
+  border-top: 1px solid var(--linje);
+}
+
+.historikk tr.valgt th {
+  color: var(--aksent);
+}
+
+.historikk td:nth-child(2) {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.stolpe {
+  flex: 1;
+  height: 8px;
+}
+
+.stolpe .bakgrunn {
+  fill: var(--linje);
+}
+
+.stolpe .fyll {
+  fill: var(--aksent);
+}
+
+.prosent {
+  min-width: 3.2em;
+  text-align: right;
+}
+
+.historikk td.over {
+  color: #c2364b;
+}
+
+@media (prefers-color-scheme: dark) {
+  .historikk td.over {
+    color: #ff8a9a;
+  }
+}
+
+.vanesammendrag {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 12px;
+  margin: 8px 0 12px;
+}
+
+.vanesammendrag p {
+  margin: 0;
+}
+
+.stor {
+  font-size: 1.8rem;
+  font-weight: 650;
+  font-variant-numeric: tabular-nums;
+}
+
+.boks > h2 + .skjema {
+  margin-top: 12px;
+}

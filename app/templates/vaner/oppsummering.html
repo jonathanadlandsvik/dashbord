@@ -1,0 +1,13 @@
+{%- set lagret_data = oppsummering -%}
+<h2>Ukeoppsummering</h2>
+<form class="skjema" hx-post="/vaner/uke/{{ ukestart.isoformat() }}" hx-target="#oppsummering" hx-swap="innerHTML">
+  <label for="skjermtid">Skjermtid, snitt per dag (timer)</label>
+  <input id="skjermtid" name="skjermtid" inputmode="decimal" maxlength="10" placeholder="f.eks. 3,4"
+         value="{{ verdier.skjermtid if verdier else (lagret_data.skjermtid_timer | komma if lagret_data and lagret_data.skjermtid_timer is not none else '') }}">
+  <p class="hjelp">Fra Skjermtid-appen. Mål: {{ skjermtid_mal | komma }} timer eller mindre.</p>
+  <label for="refleksjon">Én ting jeg justerer neste uke</label>
+  <textarea id="refleksjon" name="refleksjon" maxlength="500" rows="3">{{ verdier.refleksjon if verdier else (lagret_data.refleksjon or '' if lagret_data else '') }}</textarea>
+  {% if feil %}<p class="feil">{{ feil }}</p>{% endif %}
+  <button class="knapp sekundar" type="submit">Lagre</button>
+  {% if lagret %}<p class="melding" role="status">Lagret.</p>{% endif %}
+</form>

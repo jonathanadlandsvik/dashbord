@@ -41,6 +41,16 @@ Sikkerhet: sesjoner og koder lagres bare som SHA-256 i databasen, alle skjemaer 
 CSRF-token, endrende forespørsler må komme fra appens egen adresse (Origin-sjekk),
 og innlogging sperres et kvarter etter ti mislykkede forsøk.
 
+## Vaner
+
+`/vaner` er kveldssiden: kryss av dagens vaner, se uka og skriv søndagens oppsummering
+med skjermtid. Hver vane har et ukemål og ukedagene den gjelder. Ukemålet vises som
+*nådd*, *mulig* (kan fortsatt nås) eller *ikke nådd*. Glemte avkrysninger kan rettes
+opptil en uke tilbake.
+
+Vanene ligger i tabellen `vaner`. Endres et mål, avsluttes den gamle raden med
+`aktiv_til` og en ny legges inn, så tidligere uker vurderes mot målet som gjaldt da.
+
 ## Helsedata fra iPhone
 
 En snarvei på iPhonen sender gårsdagens tall til `POST /api/helsedata` med en egen

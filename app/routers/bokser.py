@@ -10,6 +10,7 @@ from fastapi import APIRouter, Request
 from fastapi.responses import HTMLResponse
 from sqlmodel import select
 
+from app import vaner
 from app.auth import AppSettings, DbSesjon, Innlogget
 from app.models import Dagsmaling
 from app.services import bysykkel, kalender, yr
@@ -76,3 +77,21 @@ def aktivitet(request: Request, _: Innlogget, db: DbSesjon) -> HTMLResponse:
     rader = db.exec(select(Dagsmaling).where(Dagsmaling.dato == i_gaar)).all()
     malinger = {r.maling: r.verdi for r in rader}
     return templates.TemplateResponse(request, "bokser/aktivitet.html", {"m": malinger})
+
+
+@router.get("/vaner", response_class=HTMLResponse)
+def vaner_boks(request: Request, _: Innlogget, db: DbSesjon) -> HTMLResponse:
+    i_dag = naa().date()
+    dagens = vaner.vaner_for_dag(db, i_dag)
+    gjort = vaner.avkryssede(db, i_dag, i_dag)
+    uka = vaner.uke(db, vaner.uke_start(i_dag), i_dag)
+    return templates.TemplateResponse(
+        request,
+        "bokser/vaner.html",
+        {
+            "gjort": sum(1 for v in dagens if (v.id, i_dag) in gjort),
+            "totalt": len(dagens),
+            "nadd": sum(1 for s in uka if s.tilstand == vaner.Tilstand.NADD),
+            "ukemal": len(uka),
+        },
+    )
