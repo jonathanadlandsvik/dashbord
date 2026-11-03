@@ -48,6 +48,27 @@ def tolk_tall(verdi: Any) -> float | None:
 Tall = Annotated[float | None, BeforeValidator(tolk_tall)]
 
 
+def tolk_liste(verdi: Any) -> list[float] | None:
+    """En liste med tall, som JSON-liste eller som tekst med ett tall per linje.
+
+    Når Snarveier setter en liste inn i et tekstfelt, skilles elementene med linjeskift.
+    """
+    if verdi is None or verdi == "":
+        return None
+    if isinstance(verdi, str):
+        deler = [d for d in verdi.replace(";", "\n").splitlines() if d.strip()]
+    elif isinstance(verdi, list):
+        deler = verdi
+    else:
+        raise ValueError("må være en liste med tall")
+    if len(deler) > 25:  # 24 timer, pluss én hvis perioden tar med midnatt
+        raise ValueError("kan ha maks 25 verdier")
+    tall = [tolk_tall(d) for d in deler]
+    if any(t is None or not 0 <= t <= 60 for t in tall):
+        raise ValueError("hver verdi må være minutter mellom 0 og 60")
+    return tall  # type: ignore[return-value]
+
+
 class Helsedata(BaseModel):
     model_config = ConfigDict(extra="forbid")  # ukjente felt avvises, som i v1
 
@@ -57,6 +78,9 @@ class Helsedata(BaseModel):
     treningsminutter: Tall = Field(default=None, ge=0, le=1_440)
     oppreist_minutter: Tall = Field(default=None, ge=0, le=1_440)  # fra v1, vises ikke lenger
     staatimer: Tall = Field(default=None, ge=0, le=24)  # timer med minst ett minutt stående
+    # Ståtid gruppert per time. Snarveier kan ikke lese ståtimer direkte, men en time
+    # med minst ett minutt stående er nøyaktig det ståringen på klokka teller.
+    staatid_per_time: Annotated[list[float] | None, BeforeValidator(tolk_liste)] = None
 
     @field_validator("dato")
     @classmethod
@@ -66,11 +90,12 @@ class Helsedata(BaseModel):
         return dato
 
     def malinger(self) -> dict[str, float]:
-        return {
-            navn: verdi
-            for navn, verdi in self.model_dump(exclude={"dato"}).items()
-            if verdi is not None
-        }
+        verdier = self.model_dump(exclude={"dato", "staatid_per_time"})
+        if self.staatid_per_time is not None and self.staatimer is None:
+            verdier["staatimer"] = float(
+                sum(1 for minutter in self.staatid_per_time if minutter > 0)
+            )
+        return {navn: verdi for navn, verdi in verdier.items() if verdi is not None}
 
 
 def forklar(feil: ValidationError) -> str:

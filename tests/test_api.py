@@ -248,3 +248,27 @@ def test_aktivitetsboksen_viser_staatimer(innlogget_klient, session):
     assert "Ståtimer" in svar
     assert "9<small> av 12" in svar
     assert "Oppreist" not in svar
+
+
+@pytest.mark.parametrize(
+    "per_time",
+    [
+        "0\n3\n0\n1,5\n12",  # slik Snarveier setter en liste inn i et tekstfelt
+        [0, 3, 0, 1.5, 12],  # som JSON-liste
+        "0;3;0;1,5;12",
+    ],
+)
+def test_staatimer_telles_fra_staatid_per_time(api, nokkel, session, per_time):
+    data = {"dato": "2026-11-02", "staatid_per_time": per_time}
+    svar = api.post("/api/helsedata", json=data, headers={"X-API-Key": nokkel})
+    assert svar.status_code == 200, svar.text
+    assert malinger(session) == {"staatimer": 3.0}  # tre timer med mer enn 0 minutter
+
+
+@pytest.mark.parametrize("per_time", ["5\n61", "-1", [1] * 26, "mye", {"a": 1}])
+def test_ugyldig_staatid_per_time_avvises(api, nokkel, session, per_time):
+    data = {"dato": "2026-11-02", "staatid_per_time": per_time}
+    svar = api.post("/api/helsedata", json=data, headers={"X-API-Key": nokkel})
+    assert svar.status_code == 400
+    assert "staatid_per_time" in svar.json()["feil"]
+    assert malinger(session) == {}
