@@ -20,8 +20,11 @@ def lag_app(settings: Settings) -> FastAPI:
         openapi_url=None if settings.er_produksjon else "/openapi.json",
     )
 
-    # På Vercel serveres public/ direkte fra CDN-et. Lokalt gjør FastAPI det samme.
-    app.mount("/static", StaticFiles(directory=PUBLIC / "static"), name="static")
+    # På Vercel serveres public/ fra CDN-et, og mappa er ikke med i selve funksjonen.
+    # Lokalt finnes den, og da serverer FastAPI filene selv.
+    statisk = PUBLIC / "static"
+    if statisk.is_dir():
+        app.mount("/static", StaticFiles(directory=statisk), name="static")
 
     app.include_router(forside.router)
 

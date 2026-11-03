@@ -24,3 +24,16 @@ def test_api_dokumentasjon_finnes_lokalt(klient):
 def test_api_dokumentasjon_er_skjult_i_produksjon(prod_klient):
     assert prod_klient.get("/docs").status_code == 404
     assert prod_klient.get("/openapi.json").status_code == 404
+
+
+def test_appen_starter_uten_public_mappe(monkeypatch, tmp_path):
+    # Slik er det på Vercel: public/ ligger på CDN-et, ikke i funksjonen.
+    from fastapi.testclient import TestClient
+
+    import app.main
+    from tests.conftest import settings_for
+
+    monkeypatch.setattr(app.main, "PUBLIC", tmp_path / "finnes-ikke")
+    klient = TestClient(app.main.lag_app(settings_for(app_env="production")))
+    assert klient.get("/healthz").status_code == 200
+    assert klient.get("/").status_code == 200
