@@ -190,7 +190,6 @@ def test_aktivitetsboksen_viser_gaarsdagens_tall(session):
     assert "12 345" in svar.text  # i går, med mellomrom som tusenskille
     assert "99" not in svar.text  # i dag vises ikke
     assert svar.text.count("–") == 3  # de tre som mangler
-    assert "av 12" in svar.text  # ståmålet som på klokka
 
 
 def test_aktivitetsboksen_uten_data(innlogget_klient):
@@ -246,7 +245,7 @@ def test_aktivitetsboksen_viser_staatimer(innlogget_klient, session):
     session.flush()
     svar = innlogget_klient.get("/boks/aktivitet").text
     assert "Ståtimer" in svar
-    assert "9<small> av 12" in svar
+    assert "<dd>9</dd>" in svar
     assert "Oppreist" not in svar
 
 
