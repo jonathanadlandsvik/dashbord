@@ -178,3 +178,23 @@ class ApiCache(SQLModel, table=True):
     utloper: datetime = Field(sa_type=DateTime(timezone=True))
     sist_endret: str | None = Field(default=None, max_length=64)  # Last-Modified fra tjenesten
     hentet: datetime | None = Field(default=None, sa_column=_tidsstempel())
+
+
+# ---------- Mottak av data fra iPhone (fase 5) ----------
+
+
+class IngestNokkel(SQLModel, table=True):
+    """En API-nøkkel som bare kan sende helsedata, for eksempel fra iPhone-snarveien.
+
+    Bare SHA-256 av nøkkelen lagres. Nøkkelen er lang og tilfeldig, så hashen
+    kan ikke gjettes tilbake, og et oppslag på hashen avslører ingenting om tid.
+    """
+
+    __tablename__ = "ingest_nokler"
+
+    id: int | None = Field(default=None, primary_key=True)
+    navn: str = Field(max_length=60, unique=True)
+    nokkel_hash: str = Field(max_length=64, unique=True)
+    opprettet: datetime | None = Field(default=None, sa_column=_tidsstempel())
+    sist_brukt: datetime | None = Field(default=None, sa_type=DateTime(timezone=True))
+    tilbakekalt: datetime | None = Field(default=None, sa_type=DateTime(timezone=True))

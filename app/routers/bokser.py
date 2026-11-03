@@ -2,13 +2,16 @@
 ikke holder igjen de andre, og en feil bare påvirker sin egen boks."""
 
 import logging
+from datetime import timedelta
 from functools import lru_cache
 
 import httpx
 from fastapi import APIRouter, Request
 from fastapi.responses import HTMLResponse
+from sqlmodel import select
 
 from app.auth import AppSettings, DbSesjon, Innlogget
+from app.models import Dagsmaling
 from app.services import bysykkel, kalender, yr
 from app.templating import templates
 from app.tid import naa
@@ -65,3 +68,11 @@ async def kalender_boks(request: Request, _: Innlogget, settings: AppSettings) -
         logger.exception("Kunne ikke hente kalender")
         return _feil(request, "Kalender", "Fikk ikke hentet kalenderen akkurat nå.")
     return templates.TemplateResponse(request, "bokser/kalender.html", {"hendelser": hendelser})
+
+
+@router.get("/aktivitet", response_class=HTMLResponse)
+def aktivitet(request: Request, _: Innlogget, db: DbSesjon) -> HTMLResponse:
+    i_gaar = naa().date() - timedelta(days=1)
+    rader = db.exec(select(Dagsmaling).where(Dagsmaling.dato == i_gaar)).all()
+    malinger = {r.maling: r.verdi for r in rader}
+    return templates.TemplateResponse(request, "bokser/aktivitet.html", {"m": malinger})

@@ -1,0 +1,16 @@
+{%- macro tall(verdi) -%}
+{%- if verdi is none %}–{% else %}{{ "{:,.0f}".format(verdi).replace(",", " ") }}{% endif -%}
+{%- endmacro -%}
+<section class="boks">
+  <h2>Aktivitet i går</h2>
+  {% if m %}
+  <dl class="tall tall-2">
+    <div><dt>Skritt</dt><dd>{{ tall(m.get("skritt")) }}</dd></div>
+    <div><dt>Aktiv energi</dt><dd>{{ tall(m.get("aktiv_energi")) }}<small> kcal</small></dd></div>
+    <div><dt>Trening</dt><dd>{{ tall(m.get("treningsminutter")) }}<small> min</small></dd></div>
+    <div><dt>Oppreist</dt><dd>{{ tall(m.get("oppreist_minutter")) }}<small> min</small></dd></div>
+  </dl>
+  {% else %}
+  <p class="kommer">Ingen aktivitetsdata for i går ennå.</p>
+  {% endif %}
+</section>

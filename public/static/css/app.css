@@ -333,3 +333,14 @@ details[open] summary {
   color: var(--aksent);
   font-variant-numeric: tabular-nums;
 }
+
+.tall-2 {
+  grid-template-columns: repeat(2, 1fr);
+  row-gap: 14px;
+}
+
+.tall dd small {
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: var(--dempet);
+}

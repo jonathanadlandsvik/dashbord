@@ -41,6 +41,26 @@ Sikkerhet: sesjoner og koder lagres bare som SHA-256 i databasen, alle skjemaer 
 CSRF-token, endrende forespørsler må komme fra appens egen adresse (Origin-sjekk),
 og innlogging sperres et kvarter etter ti mislykkede forsøk.
 
+## Helsedata fra iPhone
+
+En snarvei på iPhonen sender gårsdagens tall til `POST /api/helsedata` med en egen
+API-nøkkel i headeren `X-API-Key`. Nøkkelen kan bare sende helsedata, og bare en
+hash av den lagres.
+
+```json
+{"dato": "2026-11-02", "skritt": 8123, "aktiv_energi": "412,5",
+ "treningsminutter": 35, "oppreist_minutter": 720}
+```
+
+Nøkler håndteres fra terminalen:
+
+```bash
+uv run python -m app.verktoy ny-nokkel --navn iPhone   # vises én gang
+uv run python -m app.verktoy nokler                    # oversikt
+uv run python -m app.verktoy tilbakekall --navn iPhone
+uv run python -m app.verktoy importer-helsedata helsedata.db   # historikk fra v1
+```
+
 ## Database og migrasjoner
 
 Tabellene er definert i `app/models.py`, og hver endring får en migrasjon i
