@@ -15,6 +15,12 @@ og avkryssing av daglige vaner om kvelden.
 - **Hosting:** Vercel
 - **Innlogging:** passkeys (Face ID) og sesjonscookie
 
+## På hjemskjermen
+
+Appen er en PWA: åpne adressen i Safari på iPhonen, trykk Del → Legg til på
+Hjem-skjerm. Den åpnes da uten nettleserlinjer. Ikonet ligger i
+`public/static/ikoner/` og er tegnet i `ikon.svg`.
+
 ## Kom i gang lokalt
 
 Krever [uv](https://docs.astral.sh/uv/).

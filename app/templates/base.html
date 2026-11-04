@@ -9,6 +9,16 @@
   <meta name="htmx-config" content='{"includeIndicatorStyles": false, "allowEval": false}'>
   <title>{% block tittel %}Hverdagsdashbord{% endblock %}</title>
   <link rel="stylesheet" href="/static/css/app.css">
+
+  {# Installerbar på hjemskjermen (PWA). iPhone leser apple-*-taggene, Android manifestet. #}
+  <link rel="manifest" href="/static/manifest.webmanifest">
+  <link rel="icon" href="/static/ikoner/ikon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="/static/ikoner/apple-touch-icon.png">
+  <meta name="apple-mobile-web-app-title" content="Dashbord">
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="default">
+  <meta name="theme-color" content="#f2f3f7" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0f1117" media="(prefers-color-scheme: dark)">
   <script src="/static/js/htmx-2.0.4.min.js" defer></script>
 </head>
 <body{% if csrf %} hx-headers='{"X-CSRF-Token": "{{ csrf }}"}'{% endif %}>

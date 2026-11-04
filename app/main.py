@@ -1,6 +1,7 @@
 """Inngangspunktet. Vercel laster `app` herfra (se [tool.vercel] i pyproject.toml)."""
 
 import logging
+import mimetypes
 import secrets
 from pathlib import Path
 from typing import Annotated
@@ -20,6 +21,9 @@ from app.sikkerhet import Sikkerhetsmiddleware
 logger = logging.getLogger(__name__)
 
 PUBLIC = Path(__file__).resolve().parent.parent / "public"
+
+# Lokalt: riktig type for manifestet (på Vercel setter CDN-et den selv).
+mimetypes.add_type("application/manifest+json", ".webmanifest")
 
 
 def lag_app(settings: Settings) -> FastAPI:
