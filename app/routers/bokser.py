@@ -62,7 +62,7 @@ async def kalender_boks(request: Request, _: Innlogget, settings: AppSettings) -
         return _feil(
             request,
             "Kalender",
-            "Google-tilgangen er utløpt. Lag et nytt refresh token og oppdater "
+            "Google-tilgangen er utløpt. Kjør scripts/hent_google_token.py og oppdater "
             "GOOGLE_REFRESH_TOKEN i Vercel.",
         )
     except Exception:
